@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Fraunces", serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: #F7F5EF;
+  color: #23262B;
+  background-image:
+    linear-gradient(#E1DCCE 1px, transparent 1px);
+  background-size: 100% 32px;
+  background-attachment: local;
+}
+
+@media (min-width: 768px) {
+  body {
+    background-image: none;
+  }
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid #2F4D74;
+  outline-offset: 2px;
+}
+
+.notebook-card {
+  background: #FFFFFF;
+  border: 1px solid #E1DCCE;
+  border-radius: 10px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+}
