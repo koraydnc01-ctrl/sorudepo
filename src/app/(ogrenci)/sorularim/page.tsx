@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Tabs } from "@/components/ui/Tabs";
@@ -14,7 +14,7 @@ const TAB_STATUS: Record<string, Question["status"][] | null> = {
   tumu: null,
 };
 
-export default function SorularimPage() {
+function SorularimContent() {
   const supabase = createClient();
   const searchParams = useSearchParams();
   const [tab, setTab] = useState(searchParams.get("sekme") ?? "bekleyen");
@@ -69,5 +69,13 @@ export default function SorularimPage() {
         ))}
       </div>
     </div>
+  );
+}
+
+export default function SorularimPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-muted pt-4">Yükleniyor...</p>}>
+      <SorularimContent />
+    </Suspense>
   );
 }
