@@ -5,21 +5,43 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
-import { formatDateTime } from "@/lib/utils";
-import type { Question } from "@/lib/types";
+import { TAG_LABELS, TAG_LIST } from "@/lib/constants";
+import { formatDateTime, cn } from "@/lib/utils";
+import type { Question, QuestionTag } from "@/lib/types";
 
 export function StudentQuestionCard({ question }: { question: Question }) {
   const router = useRouter();
   const supabase = createClient();
   const [imageOpen, setImageOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [pickingReason, setPickingReason] = useState(false);
+
+  const isDone = question.status === "TAMAMLANDI";
+  const tags = question.question_tags ?? [];
 
   async function markSolved() {
     setSaving(true);
+    await supabase.from("questions").update({ status: "TAMAMLANDI" }).eq("id", question.id);
+    setSaving(false);
+    setPickingReason(false);
+    router.refresh();
+  }
+
+  async function markUnsolved(tag: QuestionTag) {
+    setSaving(true);
     await supabase
       .from("questions")
-      .update({ status: "OGRENCI_COZDU" })
+      .update({ status: "TEKRAR_COZULECEK" })
       .eq("id", question.id);
+    await supabase.from("question_tags").insert({ question_id: question.id, tag });
+    setSaving(false);
+    setPickingReason(false);
+    router.refresh();
+  }
+
+  async function reopen() {
+    setSaving(true);
+    await supabase.from("questions").update({ status: "BEKLIYOR" }).eq("id", question.id);
     setSaving(false);
     router.refresh();
   }
@@ -48,6 +70,19 @@ export function StudentQuestionCard({ question }: { question: Question }) {
         </div>
       </div>
 
+      {tags.length > 0 && (
+        <div className="px-3.5 pb-2 flex flex-wrap gap-1.5">
+          {tags.map((t, i) => (
+            <span
+              key={i}
+              className="text-xs px-2.5 py-1 rounded-full bg-status-tekrarBg text-status-tekrar"
+            >
+              {TAG_LABELS[t.tag]}
+            </span>
+          ))}
+        </div>
+      )}
+
       {(question.teacher_notes ?? []).length > 0 && (
         <div className="px-3.5 pb-3 flex flex-col gap-1.5">
           {question.teacher_notes!.map((n) => (
@@ -61,13 +96,57 @@ export function StudentQuestionCard({ question }: { question: Question }) {
         </div>
       )}
 
-      {question.status === "TEKRAR_COZULECEK" && (
-        <div className="px-3.5 pb-3.5">
-          <Button size="sm" onClick={markSolved} loading={saving} className="w-full">
-            Çözdüm
-          </Button>
-        </div>
-      )}
+      <div className="px-3.5 pb-3.5">
+        {!isDone && !pickingReason && (
+          <div className="flex gap-2">
+            <Button size="sm" onClick={markSolved} loading={saving} className="flex-1">
+              Çözdüm
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setPickingReason(true)}
+              disabled={saving}
+              className="flex-1"
+            >
+              Çözemedim
+            </Button>
+          </div>
+        )}
+
+        {!isDone && pickingReason && (
+          <div className="flex flex-col gap-2">
+            <div className="text-xs text-muted">Neden çözemedin?</div>
+            <div className="flex flex-wrap gap-1.5">
+              {TAG_LIST.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => markUnsolved(tag)}
+                  disabled={saving}
+                  className={cn(
+                    "text-xs px-2.5 py-1.5 rounded-full border border-line text-muted",
+                    "hover:border-brand/40 hover:text-brand"
+                  )}
+                >
+                  {TAG_LABELS[tag]}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setPickingReason(false)}
+              className="text-xs text-muted self-start"
+            >
+              Vazgeç
+            </button>
+          </div>
+        )}
+
+        {isDone && (
+          <button onClick={reopen} disabled={saving} className="text-xs text-muted">
+            Tekrar çalışmak istiyorum
+          </button>
+        )}
+      </div>
 
       {imageOpen && (
         <div

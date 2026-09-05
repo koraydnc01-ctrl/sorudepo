@@ -6,9 +6,9 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
-import { STATUS_LABELS, STATUS_ORDER, TAG_LABELS, TAG_LIST } from "@/lib/constants";
+import { STATUS_LABELS, STATUS_ORDER, TAG_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils";
-import type { Question, QuestionStatus, QuestionTag } from "@/lib/types";
+import type { Question, QuestionStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export function QuestionCard({ question }: { question: Question }) {
@@ -18,9 +18,8 @@ export function QuestionCard({ question }: { question: Question }) {
   const [imageOpen, setImageOpen] = useState(false);
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
-  const [activeTags, setActiveTags] = useState<QuestionTag[]>(
-    (question.question_tags ?? []).map((t) => t.tag)
-  );
+
+  const tags = question.question_tags ?? [];
 
   async function updateStatus(status: QuestionStatus) {
     setSaving(true);
@@ -37,22 +36,6 @@ export function QuestionCard({ question }: { question: Question }) {
       .insert({ question_id: question.id, note: note.trim() });
     setNote("");
     setSaving(false);
-    router.refresh();
-  }
-
-  async function toggleTag(tag: QuestionTag) {
-    const has = activeTags.includes(tag);
-    if (has) {
-      setActiveTags(activeTags.filter((t) => t !== tag));
-      await supabase
-        .from("question_tags")
-        .delete()
-        .eq("question_id", question.id)
-        .eq("tag", tag);
-    } else {
-      setActiveTags([...activeTags, tag]);
-      await supabase.from("question_tags").insert({ question_id: question.id, tag });
-    }
     router.refresh();
   }
 
@@ -90,81 +73,33 @@ export function QuestionCard({ question }: { question: Question }) {
         </div>
       </div>
 
+      {tags.length > 0 && (
+        <div className="px-3.5 pb-3 flex flex-wrap gap-1.5">
+          {tags.map((t, i) => (
+            <span
+              key={i}
+              className="text-xs px-2.5 py-1 rounded-full bg-status-tekrarBg text-status-tekrar"
+            >
+              Öğrenci: {TAG_LABELS[t.tag]}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div className="px-3.5 pb-3.5 flex flex-wrap gap-2">
-        {question.status === "BEKLIYOR" && (
-          <Button size="sm" onClick={() => updateStatus("DERSTE_ELE_ALINDI")} disabled={saving}>
-            Derste ele alındı
-          </Button>
-        )}
-        {question.status === "DERSTE_ELE_ALINDI" && (
-          <>
-            <Button size="sm" onClick={() => updateStatus("TEKRAR_COZULECEK")} disabled={saving}>
-              Öğrenci tekrar çözsün
-            </Button>
-            <Button size="sm" variant="secondary" onClick={() => updateStatus("TAMAMLANDI")} disabled={saving}>
-              Doğrudan tamamla
-            </Button>
-          </>
-        )}
-        {question.status === "TEKRAR_COZULECEK" && (
-          <span className="text-xs text-muted self-center">Öğrencinin tekrar çözmesi bekleniyor.</span>
-        )}
-        {question.status === "OGRENCI_COZDU" && (
-          <Button size="sm" onClick={() => updateStatus("TAMAMLANDI")} disabled={saving}>
-            Onayla ve tamamla
-          </Button>
-        )}
+        <span className="text-xs text-muted self-center">
+          Durum öğrenci tarafından güncelleniyor.
+        </span>
         <button
           onClick={() => setExpanded(!expanded)}
           className="text-xs text-brand font-medium self-center ml-auto"
         >
-          {expanded ? "Kapat" : "Detay · not · etiket"}
+          {expanded ? "Kapat" : "Not ekle · detay"}
         </button>
       </div>
 
       {expanded && (
         <div className="border-t border-line px-3.5 py-3.5 flex flex-col gap-4 bg-paper/50">
-          <div>
-            <div className="text-xs font-medium text-ink mb-2">Durumu değiştir</div>
-            <div className="flex flex-wrap gap-1.5">
-              {STATUS_ORDER.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => updateStatus(s)}
-                  disabled={saving}
-                  className={cn(
-                    "text-xs px-2.5 py-1.5 rounded-full border",
-                    s === question.status
-                      ? "border-brand text-brand bg-brand-light"
-                      : "border-line text-muted hover:border-brand/40"
-                  )}
-                >
-                  {STATUS_LABELS[s]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-xs font-medium text-ink mb-2">Zorlanma etiketleri</div>
-            <div className="flex flex-wrap gap-1.5">
-              {TAG_LIST.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={cn(
-                    "text-xs px-2.5 py-1.5 rounded-full border",
-                    activeTags.includes(tag)
-                      ? "border-brand text-brand bg-brand-light"
-                      : "border-line text-muted hover:border-brand/40"
-                  )}
-                >
-                  {TAG_LABELS[tag]}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div>
             <div className="text-xs font-medium text-ink mb-2">Öğretmen notları</div>
             <div className="flex flex-col gap-2 mb-2">
@@ -184,6 +119,29 @@ export function QuestionCard({ question }: { question: Question }) {
               <Button size="sm" onClick={addNote} disabled={saving || !note.trim()}>
                 Ekle
               </Button>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs font-medium text-ink mb-2">
+              Durumu elle değiştir <span className="text-muted font-normal">(istisnai durumlar için)</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {STATUS_ORDER.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => updateStatus(s)}
+                  disabled={saving}
+                  className={cn(
+                    "text-xs px-2.5 py-1.5 rounded-full border",
+                    s === question.status
+                      ? "border-brand text-brand bg-brand-light"
+                      : "border-line text-muted hover:border-brand/40"
+                  )}
+                >
+                  {STATUS_LABELS[s]}
+                </button>
+              ))}
             </div>
           </div>
         </div>

@@ -31,7 +31,7 @@ function SorularimContent() {
 
       const { data } = await supabase
         .from("questions")
-        .select("*, topic:topics(name), subject:subjects(name), teacher_notes(*)")
+        .select("*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag)") 
         .eq("student_id", user.id)
         .order("created_at", { ascending: false });
 
