@@ -11,7 +11,13 @@ import { formatDateTime } from "@/lib/utils";
 import type { Question, QuestionStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function QuestionCard({ question }: { question: Question }) {
+export function QuestionCard({
+  question,
+  onChanged,
+}: {
+  question: Question;
+  onChanged?: () => void | Promise<void>;
+}) {
   const router = useRouter();
   const supabase = createClient();
   const [expanded, setExpanded] = useState(false);
@@ -21,11 +27,19 @@ export function QuestionCard({ question }: { question: Question }) {
 
   const tags = question.question_tags ?? [];
 
+  async function afterChange() {
+    if (onChanged) {
+      await onChanged();
+    } else {
+      router.refresh();
+    }
+  }
+
   async function updateStatus(status: QuestionStatus) {
     setSaving(true);
     await supabase.from("questions").update({ status }).eq("id", question.id);
     setSaving(false);
-    router.refresh();
+    await afterChange();
   }
 
   async function addNote() {
@@ -36,7 +50,7 @@ export function QuestionCard({ question }: { question: Question }) {
       .insert({ question_id: question.id, note: note.trim() });
     setNote("");
     setSaving(false);
-    router.refresh();
+    await afterChange();
   }
 
   return (

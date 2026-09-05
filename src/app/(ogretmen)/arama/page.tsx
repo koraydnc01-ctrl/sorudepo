@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QuestionCard } from "@/components/ogretmen/QuestionCard";
 import { STATUS_LABELS, STATUS_ORDER, TAG_LABELS, TAG_LIST } from "@/lib/constants";
@@ -40,40 +40,41 @@ export default function AramaPage() {
     loadFilters();
   }, []);
 
-  useEffect(() => {
-    async function search() {
-      setLoading(true);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+  const search = useCallback(async () => {
+    setLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
 
-      let query = supabase
-        .from("questions")
-        .select(
-          "*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag)"
-        )
-        .eq("teacher_id", user.id)
-        .order("created_at", { ascending: false });
+    let query = supabase
+      .from("questions")
+      .select(
+        "*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag)"
+      )
+      .eq("teacher_id", user.id)
+      .order("created_at", { ascending: false });
 
-      if (studentId) query = query.eq("student_id", studentId);
-      if (topicId) query = query.eq("topic_id", topicId);
-      if (status) query = query.eq("status", status);
+    if (studentId) query = query.eq("student_id", studentId);
+    if (topicId) query = query.eq("topic_id", topicId);
+    if (status) query = query.eq("status", status);
 
-      const { data } = await query;
-      let result = (data ?? []) as Question[];
+    const { data } = await query;
+    let result = (data ?? []) as Question[];
 
-      if (tag) {
-        result = result.filter((q) =>
-          (q.question_tags ?? []).some((t) => t.tag === tag)
-        );
-      }
-
-      setQuestions(result);
-      setLoading(false);
+    if (tag) {
+      result = result.filter((q) =>
+        (q.question_tags ?? []).some((t) => t.tag === tag)
+      );
     }
-    search();
+
+    setQuestions(result);
+    setLoading(false);
   }, [studentId, topicId, status, tag]);
+
+  useEffect(() => {
+    search();
+  }, [search]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -166,7 +167,7 @@ export default function AramaPage() {
           <p className="text-sm text-muted">Kriterlere uyan soru bulunamadı.</p>
         )}
         {questions.map((q) => (
-          <QuestionCard key={q.id} question={q} />
+          <QuestionCard key={q.id} question={q} onChanged={search} />
         ))}
       </div>
     </div>

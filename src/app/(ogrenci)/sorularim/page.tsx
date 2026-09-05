@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Tabs } from "@/components/ui/Tabs";
@@ -21,25 +21,26 @@ function SorularimContent() {
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
+  const load = useCallback(async () => {
+    setLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
 
-      const { data } = await supabase
-        .from("questions")
-        .select("*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag)") 
-        .eq("student_id", user.id)
-        .order("created_at", { ascending: false });
+    const { data } = await supabase
+      .from("questions")
+      .select("*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag)")
+      .eq("student_id", user.id)
+      .order("created_at", { ascending: false });
 
-      setQuestions((data ?? []) as Question[]);
-      setLoading(false);
-    }
-    load();
+    setQuestions((data ?? []) as Question[]);
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const statuses = TAB_STATUS[tab];
   const filtered = statuses ? questions.filter((q) => statuses.includes(q.status)) : questions;
@@ -65,7 +66,7 @@ function SorularimContent() {
           <p className="text-sm text-muted">Bu sekmede soru bulunmuyor.</p>
         )}
         {filtered.map((q) => (
-          <StudentQuestionCard key={q.id} question={q} />
+          <StudentQuestionCard key={q.id} question={q} onChanged={load} />
         ))}
       </div>
     </div>

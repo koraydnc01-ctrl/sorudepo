@@ -9,7 +9,13 @@ import { TAG_LABELS, TAG_LIST } from "@/lib/constants";
 import { formatDateTime, cn } from "@/lib/utils";
 import type { Question, QuestionTag } from "@/lib/types";
 
-export function StudentQuestionCard({ question }: { question: Question }) {
+export function StudentQuestionCard({
+  question,
+  onChanged,
+}: {
+  question: Question;
+  onChanged?: () => void | Promise<void>;
+}) {
   const router = useRouter();
   const supabase = createClient();
   const [imageOpen, setImageOpen] = useState(false);
@@ -19,12 +25,20 @@ export function StudentQuestionCard({ question }: { question: Question }) {
   const isDone = question.status === "TAMAMLANDI";
   const tags = question.question_tags ?? [];
 
+  async function afterChange() {
+    if (onChanged) {
+      await onChanged();
+    } else {
+      router.refresh();
+    }
+  }
+
   async function markSolved() {
     setSaving(true);
     await supabase.from("questions").update({ status: "TAMAMLANDI" }).eq("id", question.id);
     setSaving(false);
     setPickingReason(false);
-    router.refresh();
+    await afterChange();
   }
 
   async function markUnsolved(tag: QuestionTag) {
@@ -36,14 +50,14 @@ export function StudentQuestionCard({ question }: { question: Question }) {
     await supabase.from("question_tags").insert({ question_id: question.id, tag });
     setSaving(false);
     setPickingReason(false);
-    router.refresh();
+    await afterChange();
   }
 
   async function reopen() {
     setSaving(true);
     await supabase.from("questions").update({ status: "BEKLIYOR" }).eq("id", question.id);
     setSaving(false);
-    router.refresh();
+    await afterChange();
   }
 
   return (
