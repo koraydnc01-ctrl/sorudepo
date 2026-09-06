@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,28 +17,23 @@ export default function GirisPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-
     if (signInError || !data.user) {
       setError("E-posta veya şifre hatalı.");
       setLoading(false);
       return;
     }
-
     const { data: profile } = await supabase
       .from("users")
       .select("role")
       .eq("id", data.user.id)
       .single();
-
     if (profile?.role === "teacher") router.push("/dashboard");
     else if (profile?.role === "student") router.push("/anasayfa");
     else router.push("/");
-
     router.refresh();
   }
 
@@ -47,7 +41,6 @@ export default function GirisPage() {
     <main className="min-h-screen flex flex-col justify-center px-6 py-10 max-w-sm mx-auto w-full">
       <h1 className="font-display text-3xl text-ink mb-1">Giriş yap</h1>
       <p className="text-muted text-sm mb-8">Soru Takip hesabına giriş yap.</p>
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="text-sm text-ink font-medium block mb-1.5">E-posta</label>
@@ -71,14 +64,14 @@ export default function GirisPage() {
             placeholder="••••••••"
           />
         </div>
-
         {error && <p className="text-sm text-status-bekliyor">{error}</p>}
-
+        <Link href="/sifremi-unuttum" className="text-sm text-brand font-medium text-right -mt-2">
+          Şifremi unuttum
+        </Link>
         <Button type="submit" size="lg" loading={loading} className="mt-2">
           Giriş yap
         </Button>
       </form>
-
       <div className="flex flex-col gap-2 mt-8 text-sm text-center text-muted">
         <Link href="/ogretmen-kayit" className="text-brand font-medium">
           Öğretmen olarak kayıt ol
