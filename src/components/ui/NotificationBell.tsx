@@ -46,7 +46,7 @@ export function NotificationBell() {
     loadCount();
   }, []);
 
-  async function openPanel() {
+    async function openPanel() {
     const next = !open;
     setOpen(next);
     if (!next) return;
@@ -60,18 +60,38 @@ export function NotificationBell() {
     const { data } = await supabase
       .from("notifications")
       .select(
-        "id, type, is_read, created_at, question_id, questions(topic:topics(name), student:students(users(full_name)))"
+        "id, type, is_read, created_at, question_id, questions(topic:topics(name), student_id)"
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(20);
 
-    setItems((data as any) ?? []);
+    const list = (data as any) ?? [];
+
+    const studentIds = [
+      ...new Set(list.map((n: any) => n.questions?.student_id).filter(Boolean)),
+    ];
+
+    let namesById: Record<string, string> = {};
+    if (studentIds.length > 0) {
+      const { data: studentsData } = await supabase
+        .from("students")
+        .select("id, users(full_name)")
+        .in("id", studentIds);
+      namesById = Object.fromEntries(
+        (studentsData ?? []).map((s: any) => [s.id, s.users?.full_name ?? "Bir öğrenci"])
+      );
+    }
+
+    const enriched = list.map((n: any) => ({
+      ...n,
+      studentName: namesById[n.questions?.student_id] ?? "Bir öğrenci",
+    }));
+
+    setItems(enriched);
     setLoading(false);
 
-    const unreadIds = (data ?? [])
-      .filter((n: any) => !n.is_read)
-      .map((n: any) => n.id);
+    const unreadIds = list.filter((n: any) => !n.is_read).map((n: any) => n.id);
     if (unreadIds.length > 0) {
       await supabase.from("notifications").update({ is_read: true }).in("id", unreadIds);
       setCount(0);
@@ -99,7 +119,7 @@ export function NotificationBell() {
             items.map((n) => (
               <div key={n.id} className="px-3 py-2.5 border-b border-line last:border-b-0 text-sm">
                 <div className="text-ink">
-                  {(n.questions as any)?.student?.users?.full_name ?? "Bir öğrenci"}
+                  {n.studentName}
                   {TYPE_LABELS[n.type] ?? n.type}
                   {(n.questions as any)?.topic?.name && (
                     <> ({(n.questions as any).topic.name})</>
