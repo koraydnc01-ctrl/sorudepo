@@ -14,6 +14,7 @@ export default function AramaPage() {
   const [students, setStudents] = useState<{ id: string; full_name: string }[]>([]);
   const [topics, setTopics] = useState<{ id: string; name: string }[]>([]);
 
+  const [tagFilterOpen, setTagFilterOpen] = useState(false);
   const [studentId, setStudentId] = useState("");
   const [topicId, setTopicId] = useState("");
   const [status, setStatus] = useState("");
@@ -136,28 +137,40 @@ export default function AramaPage() {
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div>
           <button
-            onClick={() => setTag("")}
-            className={cn(
-              "text-xs px-2.5 py-1.5 rounded-full border",
-              tag === "" ? "border-brand text-brand bg-brand-light" : "border-line text-muted"
-            )}
+            onClick={() => setTagFilterOpen((v) => !v)}
+            className="text-sm text-muted font-medium flex items-center gap-1"
+            type="button"
           >
-            Tüm etiketler
+            Etikete göre filtrele{tag && ` (${TAG_LABELS[tag as keyof typeof TAG_LABELS]})`}
+            <span className="text-xs">{tagFilterOpen ? "▲" : "▼"}</span>
           </button>
-          {TAG_LIST.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTag(t)}
-              className={cn(
-                "text-xs px-2.5 py-1.5 rounded-full border",
-                tag === t ? "border-brand text-brand bg-brand-light" : "border-line text-muted"
-              )}
-            >
-              {TAG_LABELS[t]}
-            </button>
-          ))}
+          {tagFilterOpen && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              <button
+                onClick={() => setTag("")}
+                className={cn(
+                  "text-xs px-2.5 py-1.5 rounded-full border",
+                  tag === "" ? "border-brand text-brand bg-brand-light" : "border-line text-muted"
+                )}
+              >
+                Tüm etiketler
+              </button>
+              {TAG_LIST.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTag(t)}
+                  className={cn(
+                    "text-xs px-2.5 py-1.5 rounded-full border",
+                    tag === t ? "border-brand text-brand bg-brand-light" : "border-line text-muted"
+                  )}
+                >
+                  {TAG_LABELS[t]}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
