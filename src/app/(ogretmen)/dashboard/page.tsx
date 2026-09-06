@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { StatCard } from "@/components/ogretmen/StatCard";
 import { StudentListItem } from "@/components/ogretmen/StudentListItem";
 import { AddStudentCard } from "@/components/ogretmen/AddStudentCard";
+import { BulkAddStudentsCard } from "@/components/ogretmen/BulkAddStudentsCard";
 import type { StudentRow } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -109,6 +110,7 @@ export default async function DashboardPage() {
         <h2 className="text-sm font-medium text-ink mb-3">Öğrenciler</h2>
         <div className="flex flex-col gap-2.5">
           <AddStudentCard teacherId={user.id} />
+          <BulkAddStudentsCard />
 
           {(pendingInvites ?? []).map((invite) => (
             <div
