@@ -60,7 +60,7 @@ export function NotificationBell() {
     const { data } = await supabase
       .from("notifications")
       .select(
-        "id, type, is_read, created_at, question_id, questions(topic:topics(name), student:students(full_name:users(full_name)))"
+        "id, type, is_read, created_at, question_id, questions(topic:topics(name), student:students(users(full_name)))"
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
@@ -99,7 +99,7 @@ export function NotificationBell() {
             items.map((n) => (
               <div key={n.id} className="px-3 py-2.5 border-b border-line last:border-b-0 text-sm">
                 <div className="text-ink">
-                  {(n.questions as any)?.student?.full_name ?? "Bir öğrenci"}{" "}
+                  {(n.questions as any)?.student?.users?.full_name ?? "Bir öğrenci"}
                   {TYPE_LABELS[n.type] ?? n.type}
                   {(n.questions as any)?.topic?.name && (
                     <> ({(n.questions as any).topic.name})</>
