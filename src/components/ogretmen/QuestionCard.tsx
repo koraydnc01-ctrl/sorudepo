@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { SecureImage } from "@/components/ui/SecureImage";
 import { Button } from "@/components/ui/Button";
 import { TAG_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils";
@@ -48,18 +48,14 @@ export function QuestionCard({
   return (
     <div className="notebook-card overflow-hidden">
       <div className="flex gap-3 p-3.5">
-        <button
-          onClick={() => setImageOpen(true)}
-          className="shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-line bg-paper relative"
-        >
-          <Image
-            src={question.image_url}
+        <div className="shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-line bg-paper">
+          <SecureImage
+            imageUrl={question.image_url}
             alt="Soru fotoğrafı"
-            fill
-            sizes="80px"
-            className="object-cover"
+            className="w-full h-full object-cover cursor-pointer"
+            onClick={() => setImageOpen(true)}
           />
-        </button>
+        </div>
 
         <div className="flex-1 min-w-0">
           <div className="text-xs text-muted">
@@ -140,8 +136,8 @@ export function QuestionCard({
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           onClick={() => setImageOpen(false)}
         >
-          <img
-            src={question.image_url}
+          <SecureImage
+            imageUrl={question.image_url}
             alt="Soru fotoğrafı"
             className="max-h-full max-w-full rounded-lg"
           />
