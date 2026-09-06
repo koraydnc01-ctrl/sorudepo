@@ -120,8 +120,7 @@ export function NotificationBell() {
             items.map((n) => (
               <div key={n.id} className="px-3 py-2.5 border-b border-line last:border-b-0 text-sm">
                 <div className="text-ink">
-                  {n.studentName}
-                  {TYPE_LABELS[n.type] ?? n.type}
+                  {n.studentName} {TYPE_LABELS[n.type] ?? n.type}
                   {(n.questions as any)?.topic?.name && (
                     <> ({(n.questions as any).topic.name})</>
                   )}
