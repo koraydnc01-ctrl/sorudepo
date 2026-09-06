@@ -32,7 +32,7 @@ export interface Question {
   subject?: { name: string };
   student?: { full_name: string };
   teacher_notes?: { id: string; note: string; created_at: string }[];
-  question_tags?: { tag: QuestionTag }[];
+  question_tags?: { tag: QuestionTag; created_at: string }[];
 }
 
 export interface StudentRow {
