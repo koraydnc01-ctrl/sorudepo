@@ -42,3 +42,33 @@ export function generateInviteCode(fullName: string) {
   }
   return `${normalized}-${suffix}`;
 }
+
+
+const SIFRE_HARFLERI = "abcdefghjkmnpqrstuvwxyz23456789";
+
+/** İsimden, toplu eklenen öğrenciler için sahte ama benzersiz bir email üretir */
+export function generateStudentEmail(fullName: string) {
+  const normalized = fullName
+    .trim()
+    .toLowerCase()
+    .replace(/İ/gi, "i")
+    .replace(/Ğ/gi, "g")
+    .replace(/Ü/gi, "u")
+    .replace(/Ş/gi, "s")
+    .replace(/Ö/gi, "o")
+    .replace(/Ç/gi, "c")
+    .replace(/[^a-z\s]/g, "")
+    .trim()
+    .replace(/\s+/g, ".");
+  const suffix = Math.floor(1000 + Math.random() * 9000);
+  return `${normalized || "ogrenci"}.${suffix}@ogrenci.sorudepo.app`;
+}
+
+/** Toplu eklenen öğrenciler için rastgele, okunabilir bir şifre üretir */
+export function generateStudentPassword() {
+  let sifre = "";
+  for (let i = 0; i < 8; i++) {
+    sifre += SIFRE_HARFLERI[Math.floor(Math.random() * SIFRE_HARFLERI.length)];
+  }
+  return sifre;
+}
