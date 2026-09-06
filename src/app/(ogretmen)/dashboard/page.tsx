@@ -33,7 +33,7 @@ export default async function DashboardPage() {
 
   const { data: questions } = await supabase
     .from("questions")
-    .select("id, student_id, status, created_at, updated_at, topic:topics(name)")
+       .select("id, student_id, status, created_at, updated_at, topic:topics(name), question_tags(id)")
     .eq("teacher_id", user.id);
 
   const allQuestions = questions ?? [];
@@ -49,7 +49,8 @@ export default async function DashboardPage() {
   const topicCounts = new Map<string, number>();
   for (const q of allQuestions) {
     const topicName = (q as any).topic?.name ?? "Diğer";
-    topicCounts.set(topicName, (topicCounts.get(topicName) ?? 0) + 1);
+   const retryCount = (q as any).question_tags?.length ?? 0;
+    topicCounts.set(topicName, (topicCounts.get(topicName) ?? 0) + retryCount);
   }
   const topTopics = [...topicCounts.entries()]
     .sort((a, b) => b[1] - a[1])
