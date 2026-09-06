@@ -14,6 +14,7 @@ type NotificationRow = {
     topic: { name: string } | null;
     student: { full_name: string } | null;
   } | null;
+    studentName: string;
 };
 
 const TYPE_LABELS: Record<string, string> = {
