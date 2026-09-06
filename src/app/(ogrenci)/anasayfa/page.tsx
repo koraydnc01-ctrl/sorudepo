@@ -36,7 +36,7 @@ export default async function OgrenciAnasayfaPage() {
 
       <Link
         href="/soru-ekle"
-        className="notebook-card bg-brand text-white flex flex-col items-center justify-center gap-2 py-14 text-center hover:bg-brand-dark transition-colors"
+        className="notebook-card !bg-brand text-white flex flex-col items-center justify-center gap-2 py-14 text-center hover:!bg-brand-dark transition-colors"
       >
         <span className="text-3xl leading-none">+</span>
         <span className="font-medium">Yapamadığım Soru Ekle</span>
