@@ -37,6 +37,7 @@ export function StudentQuestionCard({
   async function markSolved() {
     setSaving(true);
     await supabase.from("questions").update({ status: "TAMAMLANDI" }).eq("id", question.id);
+        await supabase.from("notifications").insert({ user_id: question.teacher_id, type: "ogrenci_cozdu", question_id: question.id });
     setSaving(false);
     setPickingReason(false);
     await afterChange();
@@ -49,6 +50,7 @@ export function StudentQuestionCard({
       .update({ status: "TEKRAR_COZULECEK" })
       .eq("id", question.id);
     await supabase.from("question_tags").insert({ question_id: question.id, tag });
+        await supabase.from("notifications").insert({ user_id: question.teacher_id, type: "tekrar_cozulecek", question_id: question.id });
     setSaving(false);
     setPickingReason(false);
     await afterChange();
