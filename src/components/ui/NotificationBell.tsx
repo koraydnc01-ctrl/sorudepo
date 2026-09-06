@@ -111,7 +111,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-72 max-w-[90vw] max-h-96 overflow-y-auto bg-white border border-line rounded-lg shadow-lg z-50">
+        <div className="absolute left-0 mt-2 w-72 max-w-[90vw] max-h-96 overflow-y-auto bg-white border border-line rounded-lg shadow-lg z-50">
           {loading && <p className="text-sm text-muted p-3">Yükleniyor...</p>}
           {!loading && items.length === 0 && (
             <p className="text-sm text-muted p-3">Henüz bildirim yok.</p>
