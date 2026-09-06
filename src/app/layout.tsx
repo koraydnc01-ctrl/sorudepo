@@ -35,6 +35,11 @@ export default function RootLayout({
     <html lang="tr">
       <body className={`${fraunces.variable} ${inter.variable} font-sans`}>
         {children}
+        <footer className="text-center text-xs text-muted py-6">
+          Koray Dinç
+          <br />
+          Matematik Öğretmeni
+        </footer>
       </body>
     </html>
   );
