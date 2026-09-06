@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/Button";
 export default function OgrenciKayitPage() {
   const router = useRouter();
   const supabase = createClient();
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
@@ -35,7 +34,7 @@ export default function OgrenciKayitPage() {
     const res = await fetch("/api/davet-kullan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: inviteCode, fullName }),
+      body: JSON.stringify({ code: inviteCode }),
     });
     const result = await res.json();
 
@@ -58,16 +57,6 @@ export default function OgrenciKayitPage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="text-sm text-ink font-medium block mb-1.5">Ad Soyad</label>
-          <input
-            required
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-lg border border-line bg-white focus:border-brand outline-none text-sm"
-            placeholder="Ahmet Yılmaz"
-          />
-        </div>
-        <div>
           <label className="text-sm text-ink font-medium block mb-1.5">Davet kodu</label>
           <input
             required
@@ -76,6 +65,9 @@ export default function OgrenciKayitPage() {
             className="w-full px-3.5 py-2.5 rounded-lg border border-line bg-white focus:border-brand outline-none text-sm uppercase tracking-wide"
             placeholder="AHMET-4837"
           />
+          <p className="text-xs text-muted mt-1.5">
+            İsmin, öğretmeninin bu kodu oluştururken girdiği isim olacak.
+          </p>
         </div>
         <div>
           <label className="text-sm text-ink font-medium block mb-1.5">E-posta</label>

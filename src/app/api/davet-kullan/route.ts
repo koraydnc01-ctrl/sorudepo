@@ -3,13 +3,10 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const { code, fullName } = await request.json();
+  const { code } = await request.json();
 
-  if (!code || !fullName) {
-    return NextResponse.json(
-      { error: "Davet kodu ve isim zorunludur." },
-      { status: 400 }
-    );
+  if (!code) {
+    return NextResponse.json({ error: "Davet kodu zorunludur." }, { status: 400 });
   }
 
   // İsteği yapan kullanıcının kimliğini normal (RLS'li) client ile doğrula
@@ -38,13 +35,18 @@ export async function POST(request: Request) {
     );
   }
 
-  // users tablosuna kayıt (varsa dokunma)
-  await service.from("users").upsert({
+  // İsim, öğretmenin davet kodu oluştururken girdiği isimden alınır —
+  // tek doğru kaynak bu olsun diye öğrenciye tekrar sorulmuyor.
+  const { error: userError } = await service.from("users").upsert({
     id: user.id,
     role: "student",
-    full_name: fullName,
+    full_name: invite.student_name,
     email: user.email,
   });
+
+  if (userError) {
+    return NextResponse.json({ error: userError.message }, { status: 500 });
+  }
 
   const { error: studentError } = await service.from("students").upsert({
     id: user.id,
@@ -54,10 +56,6 @@ export async function POST(request: Request) {
   if (studentError) {
     return NextResponse.json({ error: studentError.message }, { status: 500 });
   }
-
-  await service
-    .from("teacher_students")
-    .upsert({ teacher_id: invite.teacher_id, student_id: user.id });
 
   await service
     .from("invite_codes")

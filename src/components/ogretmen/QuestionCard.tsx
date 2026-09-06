@@ -6,10 +6,9 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
-import { STATUS_LABELS, STATUS_ORDER, TAG_LABELS } from "@/lib/constants";
+import { TAG_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils";
-import type { Question, QuestionStatus } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import type { Question } from "@/lib/types";
 
 export function QuestionCard({
   question,
@@ -33,13 +32,6 @@ export function QuestionCard({
     } else {
       router.refresh();
     }
-  }
-
-  async function updateStatus(status: QuestionStatus) {
-    setSaving(true);
-    await supabase.from("questions").update({ status }).eq("id", question.id);
-    setSaving(false);
-    await afterChange();
   }
 
   async function addNote() {
@@ -108,7 +100,7 @@ export function QuestionCard({
           onClick={() => setExpanded(!expanded)}
           className="text-xs text-brand font-medium self-center ml-auto"
         >
-          {expanded ? "Kapat" : "Not ekle · detay"}
+          {expanded ? "Kapat" : "Not ekle"}
         </button>
       </div>
 
@@ -122,6 +114,11 @@ export function QuestionCard({
                   {n.note}
                 </div>
               ))}
+              {(question.teacher_notes ?? []).length === 0 && (
+                <p className="text-xs text-muted">
+                  Henüz not eklenmedi. Öğrenci, eklediğin notu kendi ekranında görebilir.
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               <input
@@ -133,29 +130,6 @@ export function QuestionCard({
               <Button size="sm" onClick={addNote} disabled={saving || !note.trim()}>
                 Ekle
               </Button>
-            </div>
-          </div>
-
-          <div>
-            <div className="text-xs font-medium text-ink mb-2">
-              Durumu elle değiştir <span className="text-muted font-normal">(istisnai durumlar için)</span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {STATUS_ORDER.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => updateStatus(s)}
-                  disabled={saving}
-                  className={cn(
-                    "text-xs px-2.5 py-1.5 rounded-full border",
-                    s === question.status
-                      ? "border-brand text-brand bg-brand-light"
-                      : "border-line text-muted hover:border-brand/40"
-                  )}
-                >
-                  {STATUS_LABELS[s]}
-                </button>
-              ))}
             </div>
           </div>
         </div>
