@@ -26,7 +26,7 @@ export default async function OgrenciDetayPage({
   const { data: questions } = await supabase
     .from("questions")
     .select(
-      "*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag)"
+      "*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag, created_at)
     )
     .eq("student_id", params.id)
     .eq("teacher_id", user.id)
