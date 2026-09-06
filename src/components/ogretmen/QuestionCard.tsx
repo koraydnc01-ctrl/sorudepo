@@ -82,7 +82,7 @@ export function QuestionCard({
               key={i}
               className="text-xs px-2.5 py-1 rounded-full bg-status-tekrarBg text-status-tekrar"
             >
-              Öğrenci: {TAG_LABELS[t.tag]}
+              Öğrenci: {TAG_LABELS[t.tag]} · {formatDateTime(t.created_at)}
             </span>
           ))}
         </div>
