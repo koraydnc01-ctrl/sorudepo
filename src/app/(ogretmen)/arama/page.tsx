@@ -50,7 +50,7 @@ export default function AramaPage() {
     let query = supabase
       .from("questions")
       .select(
-        "*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag, created_at)
+        "*, topic:topics(name), subject:subjects(name), teacher_notes(*), question_tags(tag, created_at)"
       )
       .eq("teacher_id", user.id)
       .order("created_at", { ascending: false });
