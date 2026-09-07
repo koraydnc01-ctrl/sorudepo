@@ -58,4 +58,15 @@ export default async function OgrenciDetayPage({
             <span className="font-medium">{list.length}</span>{" "}
             <span className="text-muted">toplam soru</span>
           </span>
-          <span
+          <span className="text-status-bekliyor">
+            <span className="font-medium">{bekleyen}</span>{" "}
+            <span className="text-muted">bekleyen</span>
+          </span>
+          <span className="text-status-tamam">
+            <span className="font-medium">{cozulen}</span>{" "}
+            <span className="text-muted">çözülen</span>
+          </span>
+        </div>
+        <Link
+          href={`/analiz/${params.id}`}
+          className="inline-block text-sm text-brand
