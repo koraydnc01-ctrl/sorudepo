@@ -49,14 +49,9 @@ export default async function HomePage() {
         Zaten hesabım var, giriş yapayım
       </Link>
 
-      
-        href="/hakkinda"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm text-muted mt-3 font-medium underline"
-      >
+      <Link href="/hakkinda" target="_blank" className="text-sm text-muted mt-3 font-medium underline">
         Hakkında
-      </a>
+      </Link>
     </main>
   );
 }
