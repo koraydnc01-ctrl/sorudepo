@@ -77,6 +77,14 @@ export default function AramaPage() {
     search();
   }, [search]);
 
+  const grouped = new Map<string, Question[]>();
+  for (const q of questions) {
+    const topicName = (q as any).topic?.name ?? "Konusuz";
+    if (!grouped.has(topicName)) grouped.set(topicName, []);
+    grouped.get(topicName)!.push(q);
+  }
+  const groupedEntries = [...grouped.entries()].sort((a, b) => b[1].length - a[1].length);
+
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -174,13 +182,23 @@ export default function AramaPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-5">
         {loading && <p className="text-sm text-muted">Yükleniyor...</p>}
         {!loading && questions.length === 0 && (
           <p className="text-sm text-muted">Kriterlere uyan soru bulunamadı.</p>
         )}
-        {questions.map((q) => (
-          <QuestionCard key={q.id} question={q} onChanged={search} />
+        {groupedEntries.map(([topicName, topicQuestions]) => (
+          <div key={topicName} className="flex flex-col gap-3">
+            <h2 className="text-sm font-medium text-ink flex items-center gap-1.5">
+              {topicName}
+              <span className="text-xs text-muted font-normal">
+                ({topicQuestions.length})
+              </span>
+            </h2>
+            {topicQuestions.map((q) => (
+              <QuestionCard key={q.id} question={q} onChanged={search} />
+            ))}
+          </div>
         ))}
       </div>
     </div>
