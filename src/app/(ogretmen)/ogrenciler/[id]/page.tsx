@@ -58,30 +58,4 @@ export default async function OgrenciDetayPage({
             <span className="font-medium">{list.length}</span>{" "}
             <span className="text-muted">toplam soru</span>
           </span>
-          <span className="text-status-bekliyor">
-            <span className="font-medium">{bekleyen}</span>{" "}
-            <span className="text-muted">bekleyen</span>
-          </span>
-          <span className="text-status-tamam">
-            <span className="font-medium">{cozulen}</span>{" "}
-            <span className="text-muted">çözülen</span>
-          </span>
-        </div>
-        <Link
-          href={`/analiz/${params.id}`}
-          className="inline-block text-sm text-brand font-medium mt-3"
-        >
-          Konu analizini gör
-        </Link>
-      </div>
-      <div className="flex flex-col gap-5">
-        {groupedEntries.map(([topicName, topicQuestions]) => (
-          <div key={topicName} className="flex flex-col gap-3">
-            <h2 className="text-sm font-medium text-ink flex items-center gap-1.5">
-              {topicName}
-              <span className="text-xs text-muted font-normal">
-                ({topicQuestions.length})
-              </span>
-            </h2>
-            {topicQuestions.map((q) => (
-              <QuestionCard
+          <span
