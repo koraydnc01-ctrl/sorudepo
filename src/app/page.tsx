@@ -23,8 +23,8 @@ export default async function HomePage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
       <h1 className="font-display text-4xl text-ink mb-2">Soru Takip</h1>
       <p className="text-muted mb-10 max-w-xs">
-        Öğrencinin zorlandığı soruyu, öğretmenin fark ettiği konuya bağlar.
-      </p>
+  Yanlışların ve çözemediğin sorular, eksiklerini gösteren en değerli rehberindir.
+         </p>
 
       <div className="w-full max-w-xs flex flex-col gap-3">
         <Link
