@@ -36,7 +36,8 @@ export async function middleware(request: NextRequest) {
     path.startsWith("/ogretmen-kayit") ||
     path.startsWith("/ogrenci-kayit") ||
     path.startsWith("/sifremi-unuttum") ||
-    path.startsWith("/sifre-belirle");
+    path.startsWith("/sifre-belirle") ||
+    path.startsWith("/hakkinda");
 
   // Girişi olmayan kullanıcı korumalı sayfaya giremez
   if (!user && !isAuthPage && path !== "/") {
