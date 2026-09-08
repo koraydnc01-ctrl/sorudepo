@@ -3,10 +3,12 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { generateStudentEmail, generateStudentPassword } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
+type Row = { name: string; sinif?: string | null; okul_no?: string | null };
+
 export async function POST(request: Request) {
-  const { names } = await request.json();
-  if (!Array.isArray(names) || names.length === 0) {
-    return NextResponse.json({ error: "İsim listesi boş olamaz." }, { status: 400 });
+  const { rows } = await request.json();
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return NextResponse.json({ error: "Öğrenci listesi boş olamaz." }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -18,12 +20,14 @@ export async function POST(request: Request) {
   }
 
   const service = createServiceClient();
-  const results: { name: string; email: string; password: string }[] = [];
+  const results: { name: string; email: string; password: string; sinif: string | null; okul_no: string | null }[] = [];
   const errors: string[] = [];
 
-  for (const rawName of names) {
-    const name = rawName.trim();
+  for (const row of rows as Row[]) {
+    const name = row.name?.trim();
     if (!name) continue;
+    const sinif = row.sinif?.trim() || null;
+    const okulNo = row.okul_no?.trim() || null;
 
     const email = generateStudentEmail(name);
     const password = generateStudentPassword();
@@ -51,6 +55,8 @@ export async function POST(request: Request) {
     const { error: studentError } = await service.from("students").upsert({
       id: newUserId,
       teacher_id: user.id,
+      sinif,
+      okul_no: okulNo,
     });
 
     if (userError || studentError) {
@@ -58,7 +64,7 @@ export async function POST(request: Request) {
       continue;
     }
 
-    results.push({ name, email, password });
+    results.push({ name, email, password, sinif, okul_no: okulNo });
   }
 
   return NextResponse.json({ results, errors });
