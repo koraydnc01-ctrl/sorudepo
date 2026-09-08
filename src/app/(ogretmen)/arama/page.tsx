@@ -11,7 +11,9 @@ export default function AramaPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [students, setStudents] = useState<{ id: string; full_name: string }[]>([]);
+  const [students, setStudents] = useState
+    { id: string; full_name: string; sinif?: string | null; okul_no?: string | null }[]
+  >([]);
   const [topics, setTopics] = useState<{ id: string; name: string }[]>([]);
 
   const [tagFilterOpen, setTagFilterOpen] = useState(false);
@@ -29,10 +31,15 @@ export default function AramaPage() {
 
       const { data: studentRows } = await supabase
         .from("students")
-        .select("id, users(full_name)")
+        .select("id, sinif, okul_no, users(full_name)")
         .eq("teacher_id", user.id);
       setStudents(
-        (studentRows ?? []).map((s: any) => ({ id: s.id, full_name: s.users?.full_name }))
+        (studentRows ?? []).map((s: any) => ({
+          id: s.id,
+          full_name: s.users?.full_name,
+          sinif: s.sinif,
+          okul_no: s.okul_no,
+        }))
       );
 
       const { data: topicRows } = await supabase.from("topics").select("id, name").order("sort_order");
@@ -101,11 +108,17 @@ export default function AramaPage() {
           className="px-3.5 py-2.5 rounded-lg border border-line bg-white text-sm"
         >
           <option value="">Tüm öğrenciler</option>
-          {students.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.full_name}
-            </option>
-          ))}
+          {students.map((s) => {
+            const detay = [s.sinif, s.okul_no ? `No:${s.okul_no}` : null]
+              .filter(Boolean)
+              .join(" · ");
+            return (
+              <option key={s.id} value={s.id}>
+                {s.full_name}
+                {detay ? ` (${detay})` : ""}
+              </option>
+            );
+          })}
         </select>
 
         <select
