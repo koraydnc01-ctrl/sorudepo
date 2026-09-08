@@ -51,6 +51,8 @@ export async function POST(request: Request) {
   const { error: studentError } = await service.from("students").upsert({
     id: user.id,
     teacher_id: invite.teacher_id,
+    sinif: invite.sinif ?? null,
+    okul_no: invite.okul_no ?? null,
   });
 
   if (studentError) {
