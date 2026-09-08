@@ -23,7 +23,7 @@ export default async function DashboardPage() {
 
   const { data: students } = await supabase
     .from("students")
-    .select("id, users(full_name)")
+    .select("id, sinif, okul_no, users(full_name)")
     .eq("teacher_id", user.id);
 
   const { data: pendingInvites } = await supabase
@@ -64,6 +64,8 @@ export default async function DashboardPage() {
       full_name: s.users?.full_name ?? "İsimsiz öğrenci",
       invite_code: null,
       invite_used: true,
+      sinif: s.sinif ?? null,
+      okul_no: s.okul_no ?? null,
       bekleyen: studentQuestions.filter((q) =>
         ["BEKLIYOR", "DERSTE_ELE_ALINDI", "TEKRAR_COZULECEK", "OGRENCI_COZDU"].includes(
           q.status
