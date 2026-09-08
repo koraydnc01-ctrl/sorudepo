@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 
-type Result = { name: string; email: string; password: string };
+type Result = { name: string; email: string; password: string; sinif?: string | null; okul_no?: string | null };
 
 export function BulkAddStudentsCard() {
   const router = useRouter();
@@ -19,15 +19,24 @@ export function BulkAddStudentsCard() {
     setResults([]);
     setErrors([]);
 
-    const names = namesText
+    const rows = namesText
       .split("\n")
-      .map((n) => n.trim())
-      .filter(Boolean);
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const parts = line.split(" - ").map((p) => p.trim());
+        return {
+          name: parts[0] ?? "",
+          sinif: parts[1] || null,
+          okul_no: parts[2] || null,
+        };
+      })
+      .filter((r) => r.name);
 
     const res = await fetch("/api/ogrenci-toplu-ekle", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ names }),
+      body: JSON.stringify({ rows }),
     });
     const data = await res.json();
 
@@ -53,16 +62,19 @@ export function BulkAddStudentsCard() {
     <div className="notebook-card p-4">
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <label className="text-sm text-ink font-medium">
-          Öğrenci isimleri (her satıra bir isim)
+          Öğrenci bilgileri (her satıra bir öğrenci)
         </label>
         <textarea
           required
           value={namesText}
           onChange={(e) => setNamesText(e.target.value)}
           rows={6}
-          placeholder={"Ahmet Yılmaz\nAyşe Kaya\nMehmet Demir"}
+          placeholder={"Ahmet Yılmaz - 8A - 12\nAyşe Kaya - 8B\nMehmet Demir"}
           className="w-full px-3.5 py-2.5 rounded-lg border border-line bg-white focus:border-brand outline-none text-sm"
         />
+        <p className="text-xs text-muted">
+          Format: İsim - Sınıf - Numara (sınıf ve numara opsiyonel, sadece isim de yazabilirsin).
+        </p>
         <Button type="submit" loading={loading}>
           Hesapları oluştur
         </Button>
@@ -82,6 +94,8 @@ export function BulkAddStudentsCard() {
             <thead>
               <tr className="text-left text-muted border-b border-line">
                 <th className="py-1.5 pr-3">İsim</th>
+                <th className="py-1.5 pr-3">Sınıf</th>
+                <th className="py-1.5 pr-3">No</th>
                 <th className="py-1.5 pr-3">Email</th>
                 <th className="py-1.5">Şifre</th>
               </tr>
@@ -90,6 +104,8 @@ export function BulkAddStudentsCard() {
               {results.map((r, i) => (
                 <tr key={i} className="border-b border-line last:border-b-0">
                   <td className="py-1.5 pr-3">{r.name}</td>
+                  <td className="py-1.5 pr-3">{r.sinif ?? "—"}</td>
+                  <td className="py-1.5 pr-3">{r.okul_no ?? "—"}</td>
                   <td className="py-1.5 pr-3 font-mono text-xs">{r.email}</td>
                   <td className="py-1.5 font-mono text-xs">{r.password}</td>
                 </tr>
