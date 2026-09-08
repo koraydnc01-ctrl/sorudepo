@@ -43,6 +43,8 @@ export interface StudentRow {
   bekleyen: number;
   cozulen: number;
   toplam: number;
+  sinif?: string | null;
+  okul_no?: string | null;
 }
 
 // Bu proje için minimal bir Database tipi; gerçek projede
