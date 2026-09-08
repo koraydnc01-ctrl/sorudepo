@@ -19,10 +19,17 @@ type TeacherInfo = {
   students: StudentInfo[];
 };
 
-export function AdminTeacherRow({ teacher }: { teacher: TeacherInfo }) {
+export function AdminTeacherRow({
+  teacher,
+  currentUserId,
+}: {
+  teacher: TeacherInfo;
+  currentUserId: string;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const isSelf = teacher.id === currentUserId;
 
   async function handleApprove() {
     setLoading("approve");
@@ -89,7 +96,10 @@ export function AdminTeacherRow({ teacher }: { teacher: TeacherInfo }) {
     <div className="notebook-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="font-medium text-ink">{teacher.full_name}</div>
+          <div className="font-medium text-ink">
+            {teacher.full_name}
+            {isSelf && <span className="text-xs text-muted font-normal"> (sen)</span>}
+          </div>
           <div className="text-xs text-muted mt-0.5">{teacher.email}</div>
           <div className="text-xs text-muted mt-0.5">
             {teacher.students.length} öğrenci
@@ -106,14 +116,16 @@ export function AdminTeacherRow({ teacher }: { teacher: TeacherInfo }) {
               {loading === "approve" ? "Onaylanıyor..." : "Onayla"}
             </button>
           )}
-          <button
-            onClick={handleDeleteTeacher}
-            disabled={loading !== null}
-            className="text-xs px-3 py-1.5 rounded-full border border-status-bekliyor text-status-bekliyor font-medium disabled:opacity-50"
-            type="button"
-          >
-            {loading === "delete-teacher" ? "Siliniyor..." : "Öğretmeni sil"}
-          </button>
+          {!isSelf && (
+            <button
+              onClick={handleDeleteTeacher}
+              disabled={loading !== null}
+              className="text-xs px-3 py-1.5 rounded-full border border-status-bekliyor text-status-bekliyor font-medium disabled:opacity-50"
+              type="button"
+            >
+              {loading === "delete-teacher" ? "Siliniyor..." : "Öğretmeni sil"}
+            </button>
+          )}
         </div>
       </div>
 
