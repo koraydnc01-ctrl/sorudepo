@@ -45,6 +45,7 @@ export function AdminTeacherRow({
       setLoading(null);
       return;
     }
+    setLoading(null);
     router.refresh();
   }
 
@@ -67,6 +68,7 @@ export function AdminTeacherRow({
       setLoading(null);
       return;
     }
+    setLoading(null);
     router.refresh();
   }
 
@@ -89,6 +91,7 @@ export function AdminTeacherRow({
       setLoading(null);
       return;
     }
+    setLoading(null);
     router.refresh();
   }
 
