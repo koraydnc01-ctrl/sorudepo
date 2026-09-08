@@ -24,7 +24,7 @@ export function BulkAddStudentsCard() {
       .map((line) => line.trim())
       .filter(Boolean)
       .map((line) => {
-        const parts = line.split(" - ").map((p) => p.trim());
+        const parts = line.split(/\s+[-–—]\s+/).map((p) => p.trim());
         return {
           name: parts[0] ?? "",
           sinif: parts[1] || null,
