@@ -2,6 +2,10 @@ import Link from "next/link";
 import type { StudentRow } from "@/lib/types";
 
 export function StudentListItem({ student }: { student: StudentRow }) {
+  const detay = [student.sinif, student.okul_no ? `No:${student.okul_no}` : null]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <Link
       href={`/ogrenciler/${student.id}`}
@@ -9,6 +13,7 @@ export function StudentListItem({ student }: { student: StudentRow }) {
     >
       <div>
         <div className="font-medium text-ink">{student.full_name}</div>
+        {detay && <div className="text-xs text-muted mt-0.5">{detay}</div>}
         {!student.invite_used && (
           <div className="text-xs text-status-derste mt-0.5">
             Davet bekleniyor · {student.invite_code}
