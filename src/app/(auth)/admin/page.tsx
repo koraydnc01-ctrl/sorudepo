@@ -63,7 +63,7 @@ export default async function AdminPage() {
           </h2>
           <div className="flex flex-col gap-2.5">
             {bekleyenler.map((t) => (
-              <AdminTeacherRow key={t.id} teacher={t} />
+              <AdminTeacherRow key={t.id} teacher={t} currentUserId={user.id} />
             ))}
           </div>
         </div>
@@ -75,7 +75,7 @@ export default async function AdminPage() {
         </h2>
         <div className="flex flex-col gap-2.5">
           {onayliler.map((t) => (
-            <AdminTeacherRow key={t.id} teacher={t} />
+            <AdminTeacherRow key={t.id} teacher={t} currentUserId={user.id} />
           ))}
           {onayliler.length === 0 && (
             <p className="text-sm text-muted px-1">Henüz onaylı öğretmen yok.</p>
