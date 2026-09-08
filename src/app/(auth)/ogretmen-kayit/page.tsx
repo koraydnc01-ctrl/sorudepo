@@ -44,9 +44,9 @@ export default function OgretmenKayitPage() {
       return;
     }
 
-    await supabase.from("teachers").insert({ id: data.user.id });
+    await supabase.from("teachers").insert({ id: data.user.id, approved: false });
 
-    router.push("/dashboard");
+    router.push("/onay-bekliyor");
     router.refresh();
   }
 
