@@ -31,6 +31,8 @@ export function AdminTeacherRow({
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const isSelf = teacher.id === currentUserId;
+  const allSelected =
+    teacher.students.length > 0 && selected.size === teacher.students.length;
 
   function toggleSelected(id: string) {
     setSelected((prev) => {
@@ -38,6 +40,13 @@ export function AdminTeacherRow({
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelected((prev) => {
+      if (prev.size === teacher.students.length) return new Set();
+      return new Set(teacher.students.map((s) => s.id));
     });
   }
 
@@ -177,9 +186,17 @@ export function AdminTeacherRow({
             <span className="transition-transform duration-200 group-open:rotate-180">▼</span>
           </summary>
 
-          {selected.size > 0 && (
-            <div className="flex items-center justify-between mt-2 mb-1 px-1">
-              <span className="text-xs text-muted">{selected.size} öğrenci seçildi</span>
+          <div className="flex items-center justify-between mt-2 mb-1 px-1">
+            <label className="flex items-center gap-1.5 text-xs text-muted cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleSelectAll}
+                disabled={loading !== null}
+              />
+              Tümünü seç {selected.size > 0 && `(${selected.size})`}
+            </label>
+            {selected.size > 0 && (
               <button
                 onClick={handleDeleteSelected}
                 disabled={loading !== null}
@@ -188,8 +205,8 @@ export function AdminTeacherRow({
               >
                 {loading === "delete-selected" ? "Siliniyor..." : "Seçilenleri sil"}
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="flex flex-col gap-1.5 mt-2">
             {teacher.students.map((s) => {
